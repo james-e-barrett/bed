@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "HOME <- getwd()\n\nsource(paste(HOME,'/R_files/bed_fit_model.R',sep=''))\nsource(paste(HOME,'/R_files/bed_marginal.R',sep=''))\nsource(paste(HOME,'/R_files/MAPxw.R',sep=''))\nsource(paste(HOME,'/R_files/hamming.R',sep=''))\n\n\nset.seed(13145)\n\n# ----- Numerically generate some reads with 8 CpGs per read ----- #\n\n# Generate 50 reads that are fully methylated\nY1 <- matrix(rep(c(1,1,1,1,1,1,1,1),50), nrow=50, ncol=8)\n\n# Generate 30 reads that are half methylated\nY2 <- matrix(rep(c(1,1,1,1,0,0,0,0),30),nrow=30, ncol=8, byrow=TRUE)\n\n# Generate 20 reads that are fully unmethylated\nY3 <- matrix(rep(c(0,0,0,0,0,0,0,0),20),nrow=20,ncol=8)\n\n# Combine them\nY <- rbind(Y1,Y2,Y3)\n\n# Add some noise by randomly regenerating 20 percent of values\nY[sample(1:800,80,replace=FALSE)] <- round(runif(80))\n\n\n# ----- Infer which epialleles are present ----- #\n\nmodel <- bed_fit(Y)\n\n# Plot AIC score (by default the algorithm will stop at ten if it has already found a minimum)\nplot(model$AIC[1:10], type='b', xlab='Q = number of epialleles', ylab='AIC score')\n\n# The model$rho field contains the optimal number of epialleles\ncat(' Optimal number of epialleles =', model$rho,'\\n')\n\n# Finally, the model$model list structure contains fitted models for each value of Q (no of epialleles)\n#\n# model$model[[3]] is the optimal model\n# model$model[[3]]$W is a 100-dimensional vector that specifies which epiallele each read corresponds to\n# model$model[[3]]$X is a 3 by 8 matrix where each row corresponds to an inferred epiallele\n# model$model[[3]]$matches counts the total matches between the inferred epialleles and oberved reads\n# model$model[[3]]$mismatches counts the total mismatches between the inferred epialleles and oberved reads\n# model$model[[3]]$beta is the inferred noise hyperparameter\n# model$model[[3]]$AIC is the AIC score\n\n# ----- Marginalise over W posterior ----- #\n\n# w.margin is 100 by 3 matrix where element [i,mu] is the probability that read i corresponds to epiallele mu\nw.margin <- bed_marginal(Y, model$model[[model$rho]]$X, model$mode[[model$rho]]$W)\n\n# Summing over the columns gives the total proportion of reads that are attributed to each epiallele\np <- apply(w.margin, 2, FUN='sum')/100\ncat(' Inferred Epiallele [1] =',paste(model$model[[3]]$X[1,],collapse=\"\"),\n    ', Proportion =', p[1],'\\n',\n    'Inferred Epiallele [2] =',paste(model$model[[3]]$X[2,],collapse=\"\"),\n    ', Proportion =', p[2],'\\n',\n    'Inferred Epiallele [3] =',paste(model$model[[3]]$X[3,],collapse=\"\")\n    ,', Proportion =', p[3])\n",
+    "created" : 1485958582488.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1005084830",
+    "id" : "C611C78C",
+    "lastKnownWriteTime" : 1485963119,
+    "last_content_update" : 1485963119675,
+    "path" : "~/Dropbox/R_latest_version_ZYMO/release-code/example.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

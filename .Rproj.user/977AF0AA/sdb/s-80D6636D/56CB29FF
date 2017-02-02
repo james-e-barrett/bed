@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "Package: bed\nType: Package\nTitle: Bayesian Epiallele Detection\nVersion: 1.0.0\nAuthors@R: person(\"James\", \"Barrett\", email = \"james.barrett@kcl.ac.uk\", role = c(\"aut\", \"cre\"))\nDescription: Infers which epialleles are present from DNAm sequencing data. Both\n    the optimal number of epialleles and the DNAm pattern of the epialleles are\n    inferred from observed DNAm sequencing reads. Which epiallele each observed\n    read can be attributed to is also inferred.\nLicense: GPL-3\nLazyData: TRUE\nRoxygenNote: 6.0.0.9000\n",
+    "created" : 1485959561047.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2634037422",
+    "id" : "56CB29FF",
+    "lastKnownWriteTime" : 1485960135,
+    "last_content_update" : 1485960135886,
+    "path" : "~/Dropbox/bed/DESCRIPTION",
+    "project_path" : "DESCRIPTION",
+    "properties" : {
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "dcf"
+}

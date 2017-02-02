@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "#' Marginal epiallele distribution\n#'\n#' Marginalises over the W parameter in a fitted epiallele model\n#' @param Y an N by d numeric matrix of observed DNAm reads\n#' @param X a Q by d numeric matrix of inferred epialleles\n#' @param W an N by 1 numeric vector assigning reads to epiallels\n#' @return An N by d numerc matrix where where element [i,mu] is the probability\n#' that read i corresponds to epiallele mu.\n#' @examples\n#' set.seed(1314)\n#'\n#' # Generate 50 reads that are fully methylated\n#' Y1 <- matrix(rep(c(1,1,1,1,1,1,1,1),50), nrow=50, ncol=8)\n#'\n#' # Generate 30 reads that are half methylated\n#' Y2 <- matrix(rep(c(1,1,1,1,0,0,0,0),30),nrow=30, ncol=8, byrow=TRUE)\n#'\n#' # Generate 20 reads that are fully unmethylated\n#' Y3 <- matrix(rep(c(0,0,0,0,0,0,0,0),20),nrow=20,ncol=8)\n#'\n#' # Combine them\n#' Y <- rbind(Y1,Y2,Y3)\n#'\n#' # Add some noise by randomly regenerating 20 percent of values\n#' Y[sample(1:800,80,replace=FALSE)] <- round(runif(80))\n#'\n#' # Make a few data missing\n#' Y[sample(1:800,5,replace=FALSE)] <- NA\n#'\n#' # Infer which epialleles are present\n#' fit <- bed_fit(Y)\n#'\n#' # Plot AIC score\n#' plot(fit$AIC[1:10], type='b', xlab='Q = number of epialleles',\n#'     ylab='AIC score')\n#'\n#' # The fit$rho field contains the optimal number of epialleles\n#' cat(' Optimal number of epialleles =', fit$rho,'\\n')\n#'\n#' #Marginalise over W posterior\n#' w.margin <- bed_marginal(Y, fit$model[[fit$rho]]$X, fit$model[[fit$rho]]$W)\n#'\n#' # Summing over the columns gives the total proportion of reads that are\n#' # attributed to each epiallele\n#' p <- apply(w.margin, 2, FUN='sum')/100\n#' cat(' Inferred Epiallele [1] =',paste(fit$model[[3]]$X[1,],collapse=\"\"),\n#'     ', Proportion =', p[1],'\\n',\n#'     'Inferred Epiallele [2] =',paste(fit$model[[3]]$X[2,],collapse=\"\"),\n#'     ', Proportion =', p[2],'\\n',\n#'     'Inferred Epiallele [3] =',paste(fit$model[[3]]$X[3,],collapse=\"\")\n#'     ,', Proportion =', p[3])\n#'\n#' @seealso \\code{\\link{bed_fit}}\n\nbed_marginal <- function(Y,X,W){\n\n   Q <- nrow(X)\n   N <- nrow(Y)\n\n   N.plus <- numeric(Q)\n   N.minus <- numeric(Q)\n\n   for (q in seq(1,Q)){\n      N.q <- sum(W==q)\n      term1 <- colSums(Y[W==q,,drop=FALSE], na.rm = TRUE)\n      term3 <- colSums(!is.na(Y[W==q,,drop=FALSE]), na.rm = TRUE)\n      term2 <- term3 - term1\n      N.plus[q] <- sum(term1[X[q,]==1]) + sum(term2[X[q,]==0])\n      N.minus[q] <- sum(term3) - N.plus[q]\n   }\n\n   matches <- sum(N.plus)\n   mismatches <- sum(N.minus)\n\n   # change w\n   w.margin <- matrix(NA,N,Q)\n\n   for (i in 1:N){\n      w <- numeric(Q)\n      for (mu in 1:Q){\n\n         # subtract MAP matches and add current matches\n         w.matches <- matches - sum(Y[i,] == X[W[i],], na.rm = TRUE) +\n            sum(Y[i,] == X[mu,], na.rm = TRUE)\n         w.mismatches <- mismatches - sum(Y[i,] != X[W[i],], na.rm = TRUE) +\n            sum(Y[i,] != X[mu,], na.rm = TRUE)\n\n         beta <- max(mismatches,1)/(matches+mismatches)\n         #beta <- 0.05\n\n         w[mu] <- w.matches*log(1-beta) + w.mismatches*log(beta)\n      }\n      w.margin[i,] <- exp(w - mean(w))/sum(exp(w - mean(w)))\n   }\n\n   return(w.margin)\n}\n",
+    "created" : 1485958183975.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "416702084",
+    "id" : "992612F9",
+    "lastKnownWriteTime" : 1486027345,
+    "last_content_update" : 1486027345719,
+    "path" : "~/Dropbox/bed/R/bed_marginal.R",
+    "project_path" : "R/bed_marginal.R",
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

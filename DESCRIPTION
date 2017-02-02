@@ -1,0 +1,12 @@
+Package: bed
+Type: Package
+Title: Bayesian Epiallele Detection
+Version: 1.0.0
+Authors@R: person("James", "Barrett", email = "james.barrett@kcl.ac.uk", role = c("aut", "cre"))
+Description: Infers which epialleles are present from DNAm sequencing data. Both
+    the optimal number of epialleles and the DNAm pattern of the epialleles are
+    inferred from observed DNAm sequencing reads. Which epiallele each observed
+    read can be attributed to is also inferred.
+License: GPL-3
+LazyData: TRUE
+RoxygenNote: 6.0.0.9000
