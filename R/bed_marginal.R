@@ -21,8 +21,8 @@
 #' # Combine them
 #' Y <- rbind(Y1,Y2,Y3)
 #'
-#' # Add some noise by randomly regenerating 20 percent of values
-#' Y[sample(1:800,80,replace=FALSE)] <- round(runif(80))
+#' # Add some noise by randomly regenerating 5 percent of values
+#' Y[sample(1:800,40,replace=FALSE)] <- round(runif(40))
 #'
 #' # Make a few data missing
 #' Y[sample(1:800,5,replace=FALSE)] <- NA
@@ -32,7 +32,7 @@
 #'
 #' # Plot AIC score
 #' plot(fit$AIC[1:10], type='b', xlab='Q = number of epialleles',
-#'     ylab='AIC score')
+#'     ylab='AIC score', ylim=c(200,300))
 #'
 #' # The fit$rho field contains the optimal number of epialleles
 #' cat(' Optimal number of epialleles =', fit$rho,'\n')
@@ -41,14 +41,17 @@
 #' w.margin <- bed_marginal(Y, fit$model[[fit$rho]]$X, fit$model[[fit$rho]]$W)
 #'
 #' # Summing over the columns gives the total proportion of reads that are
-#' # attributed to each epiallele
+#' # attributed to each epiallele. Just over 4 percent of reads are attributed to
+#' # a spurious epiallele (due to noise)
 #' p <- apply(w.margin, 2, FUN='sum')/100
-#' cat(' Inferred Epiallele [1] =',paste(fit$model[[3]]$X[1,],collapse=""),
+#' cat(' Inferred Epiallele [1] =',paste(fit$model[[4]]$X[1,],collapse=""),
 #'     ', Proportion =', p[1],'\n',
-#'     'Inferred Epiallele [2] =',paste(fit$model[[3]]$X[2,],collapse=""),
+#'     'Inferred Epiallele [2] =',paste(fit$model[[4]]$X[2,],collapse=""),
 #'     ', Proportion =', p[2],'\n',
-#'     'Inferred Epiallele [3] =',paste(fit$model[[3]]$X[3,],collapse="")
-#'     ,', Proportion =', p[3])
+#'     'Inferred Epiallele [3] =',paste(fit$model[[4]]$X[3,],collapse=""),
+#'     ', Proportion =', p[3],'\n',
+#'     'Inferred Epiallele [4] =',paste(fit$model[[4]]$X[4,],collapse="")
+#'     ,', Proportion =', p[4])
 #'
 #' @seealso \code{\link{bed_fit}}
 
@@ -86,7 +89,6 @@ bed_marginal <- function(Y,X,W){
             sum(Y[i,] != X[mu,], na.rm = TRUE)
 
          beta <- max(mismatches,1)/(matches+mismatches)
-         #beta <- 0.05
 
          w[mu] <- w.matches*log(1-beta) + w.mismatches*log(beta)
       }
